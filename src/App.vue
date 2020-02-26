@@ -1,23 +1,44 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <div>
+<h1>Countries</h1>
+  <countries-list :countries='countries'></countries-list>
+
+      <country-detail v-if="selectedCountry" :country='selectedCountry'></country-detail>
+</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CountriesList from './components/CountriesList.vue'
+import CountryDetail from './components/CountryDetail.vue'
+import {eventBus} from './main.js'
 
 export default {
-  name: 'App',
+  name: 'app',
+  data(){
+    return {
+      countries: [],
+      selectedCountry: null
+    };
+  },
+  mounted(){
+    fetch('https://restcountries.eu/rest/v2/all')
+    .then(res => res.json())
+    .then(data => this.countries = data)
+
+    eventBus.$on('country-selected', (country) => {
+      this.selectedCountry = country;
+    })
+  },
   components: {
-    HelloWorld
-  }
+    "countries-list": CountriesList,
+    "country-detail": CountryDetail
+  },
 }
 </script>
 
 <style>
 #app {
+  display: flex;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
